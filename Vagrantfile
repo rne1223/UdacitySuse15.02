@@ -10,10 +10,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# set the image for the vagrant box
 	config.vm.box = "opensuse/Leap-15.2.x86_64"
 
-	# config.vm.provision:shell, path: "bootstrap.sh"
+	config.vm.provision "shell" , path: "./bootstrap.sh"
 
     config.vm.define "default" do |default|
-       default.vm.hostname = "udacitySuse"
+       default.vm.hostname = "UdacitySuse15.02"
     end
 
 	# consifure the parameters for VirtualBox provider
