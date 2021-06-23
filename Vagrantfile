@@ -10,6 +10,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	# set the image for the vagrant box
 	config.vm.box = "opensuse/Leap-15.2.x86_64"
 
+	# Move bin folder to guess machine
+	config.vm.provision "file", source: "./misc/bin", destination: "/home/vagrant/"
+	# Move .kube folder to guess machine
+	config.vm.provision "file", source: "./misc/.kube", destination: "/home/vagrant/"
+	# Running bootstrap script to update zypper and modify .bashrc
 	config.vm.provision "shell" , path: "./bootstrap.sh"
 
     config.vm.define "default" do |default|
