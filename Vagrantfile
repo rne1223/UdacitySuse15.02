@@ -12,8 +12,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 	# Move bin folder to guess machine
 	config.vm.provision "file", source: "./misc/bin", destination: "/home/vagrant/"
-	# Move .kube folder to guess machine
-	config.vm.provision "file", source: "./misc/.kube", destination: "/home/vagrant/"
+
 	# Running bootstrap script to update zypper and modify .bashrc
 	config.vm.provision "shell" , path: "./bootstrap.sh"
 

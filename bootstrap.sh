@@ -1,11 +1,11 @@
 #!/bin/bash
 # Bootstrap machine
 
-ENV_HOME="/home/vagrant"
-ENV_BASHRC="${ENV_HOME}/.bashrc" 
-ENV_PROFILE="${ENV_HOME}/.profile" 
-ENV_BIN="${ENV_HOME}/bin/"
-ENV_KUBELOC="${ENV_HOME}/.kube"
+ENV_HOME="/home/vagrant/"
+ENV_BASHRC="${ENV_HOME}.bashrc" 
+ENV_PROFILE="${ENV_HOME}.profile" 
+ENV_BIN="${ENV_HOME}bin/"
+ENV_KUBELOC="${ENV_HOME}.kube/"
 
 step=1
 step() {
@@ -46,8 +46,15 @@ install_git() {
     sudo zypper install -y git
 }
 
-modify_env() {
-    step "===== Updating Enviroment ====="
+install_pip_flask(){
+    step "===== Installing Pip and Flask ====="
+    sudo zypper install -y python3-pip
+    sudo pip3 install --upgrade pip
+    sudo pip install flask
+}
+
+modify_bashrc() {
+    step "===== Updating ~/.bashrc ====="
 
     # Making bin files executable
     chmod +x "${ENV_BIN}"/*
@@ -59,10 +66,19 @@ modify_env() {
     echo 'complete -F __start_kubectl k' >> "${ENV_BASHRC}"
     echo "source /usr/share/bash-completion/bash_completion && source <(helm completion bash)" >> "${ENV_BASHRC}"
     echo "source /usr/share/bash-completion/bash_completion && source <(kind completion bash)" >> "${ENV_BASHRC}"
-    echo "export KUBECONFIG=${ENV_KUBELOC}/my-kubeconfig" >> "${ENV_BAHSRC}" 
 
-    # Modify ~/.profile to start kind cluster
-    echo "kind create cluster --name my-kube-cluster" >> "${ENV_PROFILE}"
+}
+
+# Modify ~/.profile to start kind cluster if my-kubeconfig file does not exist
+modify_profile() {
+    step "===== Updating ~/.profile ===="
+
+    echo "if [ ! -f ~/.kube/my-kubeconfig ]; then" >> ${ENV_PROFILE}
+    echo   "kind create cluster --name my-kube-cluster --kubeconfig ${ENV_HOME}.kube/my-kubeconfig" >> "${ENV_PROFILE}"
+    echo   "export KUBECONFIG=${ENV_KUBELOC}my-kubeconfig" >> "${ENV_PROFILE}" 
+    echo "else" >> "${ENV_PROFILE}"
+    echo   "echo '===== Kubernetes Cluster Already Initiated ====='" >> "${ENV_PROFILE}"
+    echo "fi" >> "${ENV_PROFILE}"
 }
 
 main() {
@@ -70,7 +86,9 @@ main() {
     install_docker
     install_go
     install_git
-    modify_env
+    install_pip_flask
+    modify_bashrc
+    modify_profile
 
     echo ==========
     echo "All DONE"
